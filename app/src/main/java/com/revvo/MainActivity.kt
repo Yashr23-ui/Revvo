@@ -4,44 +4,85 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.revvo.ui.components.BottomNavigationBar
+import com.revvo.ui.screens.*
 import com.revvo.ui.theme.RevvoTheme
 
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             RevvoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+
+                // ── Track which screen is currently showing ──────────────────
+                var currentScreen  by remember { mutableStateOf("home") }
+                var selectedRideId by remember { mutableStateOf("") }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        // Show bottom nav only on main screens
+                        if (currentScreen in listOf("home", "profile", "create")) {
+                            BottomNavigationBar(
+                                currentRoute   = currentScreen,
+                                onItemSelected = { currentScreen = it }
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+
+                    Box(modifier = Modifier.padding(innerPadding)) {
+
+                        // ── Screen router ────────────────────────────────────
+                        when (currentScreen) {
+
+                            "home" -> HomeScreen(
+                                onRideClick  = { rideId ->
+                                    selectedRideId = rideId
+                                    currentScreen  = "rideDetails"
+                                },
+                                onCreateRide = { currentScreen = "create" }
+                            )
+
+                            "create" -> CreateRideScreen(
+                                onBack        = { currentScreen = "home" },
+                                onRideCreated = { currentScreen = "home" }
+                            )
+
+                            "profile" -> ProfileScreen(
+                                onEditProfile = { }
+                            )
+
+                            "rideDetails" -> RideDetailsScreen(
+                                rideId = selectedRideId,
+                                onBack = { currentScreen = "home" },
+                                onJoin = { currentScreen = "home" }
+                            )
+
+                            // fallback
+                            else -> HomeScreen(
+                                onRideClick  = { rideId ->
+                                    selectedRideId = rideId
+                                    currentScreen  = "rideDetails"
+                                },
+                                onCreateRide = { currentScreen = "create" }
+                            )
+                        }
+
+                    } // ← closes Box
+
+                } // ← closes Scaffold content
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RevvoTheme {
-        Greeting("Android")
     }
 }
