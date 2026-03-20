@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.revvo.ui.components.BottomNavigationBar
-import com.revvo.ui.screens.*
+import com.revvo.ui.navigation.AppNavHost
 import com.revvo.ui.theme.RevvoTheme
 
 
@@ -42,42 +42,13 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
 
                     Box(modifier = Modifier.padding(innerPadding)) {
-
-                        // ── Screen router ────────────────────────────────────
-                        when (currentScreen) {
-
-                            "home" -> HomeScreen(
-                                onRideClick  = { rideId ->
-                                    selectedRideId = rideId
-                                    currentScreen  = "rideDetails"
-                                },
-                                onCreateRide = { currentScreen = "create" }
-                            )
-
-                            "create" -> CreateRideScreen(
-                                onBack        = { currentScreen = "home" },
-                                onRideCreated = { currentScreen = "home" }
-                            )
-
-                            "profile" -> ProfileScreen(
-                                onEditProfile = { }
-                            )
-
-                            "rideDetails" -> RideDetailsScreen(
-                                rideId = selectedRideId,
-                                onBack = { currentScreen = "home" },
-                                onJoin = { currentScreen = "home" }
-                            )
-
-                            // fallback
-                            else -> HomeScreen(
-                                onRideClick  = { rideId ->
-                                    selectedRideId = rideId
-                                    currentScreen  = "rideDetails"
-                                },
-                                onCreateRide = { currentScreen = "create" }
-                            )
-                        }
+                        AppNavHost(
+                            currentScreen = currentScreen,
+                            selectedRideId = selectedRideId,
+                            onCurrentScreenChange = { currentScreen = it },
+                            onSelectedRideIdChange = { selectedRideId = it },
+                            onEditProfile = { }
+                        )
 
                     } // ← closes Box
 

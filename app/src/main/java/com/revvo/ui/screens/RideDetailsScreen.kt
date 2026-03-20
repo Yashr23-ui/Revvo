@@ -11,6 +11,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,24 +21,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.revvo.ui.components.*
 import com.revvo.ui.theme.*
+import com.revvo.ui.model.toRideCardData
+import com.revvo.viewmodel.RideViewModel
 
 @Composable
 fun RideDetailsScreen(
     rideId : String,
     onBack : () -> Unit,
-    onJoin : (String) -> Unit
+    onJoin : (String) -> Unit,
+    rideViewModel: RideViewModel
 ) {
-    val ride = RideCardData(
-        rideId        = rideId,
-        title         = "Mussoorie Night Ride",
-        organizer     = "Yash R.",
-        date          = "Sun, 22 Jun · 6:00 AM",
-        distance      = "120 km",
-        memberCount   = 8,
-        maxMembers    = 15,
-        status        = RideStatus.UPCOMING,
-        startLocation = "Dehradun"
-    )
+    val rideCards by rideViewModel.rideCards.collectAsState()
+    val rideModel = rideViewModel.getRideById(rideId)
+    val ride = rideCards.firstOrNull { it.rideId == rideId } ?: rideModel?.toRideCardData()
+
+    if (ride == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(RevvoDark),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Ride not found",
+                color = RevvoWhite,
+                fontWeight = FontWeight.Black
+            )
+        }
+        return
+    }
 
     val routePoints = listOf(
         "Clock Tower, Dehradun" to "START",
@@ -45,9 +58,15 @@ fun RideDetailsScreen(
         "Mussoorie Mall Road"   to "FINISH"
     )
 
-    val riders = listOf("YR" to "Yash R.","AK" to "Arjun K.",
-        "PS" to "Priya S.","RM" to "Rohan M.",
-        "ST" to "Sneha T.","DP" to "Dev P.")
+    val baseRiders = listOf(
+        "YR" to "Yash R.",
+        "AK" to "Arjun K.",
+        "PS" to "Priya S.",
+        "RM" to "Rohan M.",
+        "ST" to "Sneha T.",
+        "DP" to "Dev P."
+    )
+    val riders = baseRiders.take(ride.memberCount.coerceAtMost(baseRiders.size))
 
     Box(
         modifier = Modifier
@@ -174,7 +193,7 @@ fun RideDetailsScreen(
             item {
                 AnimatedScreenEntry(delayMs = 400) {
                     Text(
-                        text          = "RIDERS (${riders.size}/${ride.maxMembers})",
+                        text          = "RIDERS (${ride.memberCount}/${ride.maxMembers})",
                         fontSize      = 10.sp,
                         color         = RevvoGray,
                         fontWeight    = FontWeight.Black,
@@ -220,7 +239,10 @@ fun RideDetailsScreen(
 
         // ── Floating JOIN button ──────────────────────────────────────
         Button(
-            onClick  = { onJoin(rideId) },
+            onClick  = {
+                rideViewModel.joinRide(rideId)
+                onJoin(rideId)
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()

@@ -9,7 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,13 +20,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.revvo.ui.components.*
 import com.revvo.ui.theme.*
+import com.revvo.viewmodel.UserViewModel
 
 @Composable
-fun ProfileScreen(onEditProfile: () -> Unit) {
+fun ProfileScreen(
+    onEditProfile: () -> Unit,
+    userViewModel: UserViewModel
+) {
+    val user by userViewModel.user.collectAsState()
+
+    val initials = user.name
+        .split(" ")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .take(2)
+        .map { it.first().uppercase() }
+        .joinToString("")
+
+    val kmsText = if (user.totalDistance >= 1000) {
+        "${user.totalDistance / 1000}k"
+    } else {
+        user.totalDistance.toString()
+    }
 
     val stats = listOf(
-        Triple(Icons.Default.TwoWheeler, "RIDES",   "24"),
-        Triple(Icons.Default.Timeline,   "KMS",     "1.2k"),
+        Triple(Icons.Default.TwoWheeler, "RIDES",   user.totalRides.toString()),
+        Triple(Icons.Default.Timeline,   "KMS",     kmsText),
         Triple(Icons.Default.People,     "BUDDIES", "31"),
         Triple(Icons.Default.EmojiEvents,"BADGES",  "7")
     )
@@ -104,7 +125,7 @@ fun ProfileScreen(onEditProfile: () -> Unit) {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text       = "SN",
+                                text       = initials,
                                 fontSize   = 24.sp,
                                 fontWeight = FontWeight.Black,
                                 color      = RevvoOrange
@@ -112,7 +133,7 @@ fun ProfileScreen(onEditProfile: () -> Unit) {
                         }
                         Column {
                             Text(
-                                text       = "Shashwat Negi",
+                                text       = user.name,
                                 fontSize   = 20.sp,
                                 fontWeight = FontWeight.Black,
                                 color      = RevvoWhite
@@ -131,7 +152,7 @@ fun ProfileScreen(onEditProfile: () -> Unit) {
                                     .padding(horizontal = 10.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text       = "RE Himalayan · 2022",
+                                    text       = user.bike,
                                     fontSize   = 10.sp,
                                     color      = RevvoOrange,
                                     fontWeight = FontWeight.Black

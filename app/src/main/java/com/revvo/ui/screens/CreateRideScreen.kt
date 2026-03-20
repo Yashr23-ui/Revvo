@@ -18,13 +18,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.revvo.viewmodel.RideViewModel
 import com.revvo.ui.components.AnimatedScreenEntry
 import com.revvo.ui.theme.*
 
 @Composable
 fun CreateRideScreen(
     onBack        : () -> Unit,
-    onRideCreated : () -> Unit
+    onRideCreated : () -> Unit,
+    rideViewModel : RideViewModel
 ) {
     var rideTitle   by remember { mutableStateOf("") }
     var startPoint  by remember { mutableStateOf("") }
@@ -127,7 +129,18 @@ fun CreateRideScreen(
             // ── Create button ─────────────────────────────────────────
             AnimatedScreenEntry(delayMs = 600) {
                 Button(
-                    onClick  = onRideCreated,
+                    onClick  = {
+                        val parsedMaxRiders = maxRiders.toIntOrNull()?.coerceAtLeast(1) ?: 1
+                        rideViewModel.createRide(
+                            title = rideTitle.trim(),
+                            location = startPoint.trim(),
+                            date = rideDate.trim(),
+                            distance = destination.trim(),
+                            maxRiders = parsedMaxRiders,
+                            description = description.trim()
+                        )
+                        onRideCreated()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)

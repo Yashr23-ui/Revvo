@@ -1,5 +1,5 @@
 package com.revvo.ui.screens
-
+import com.revvo.viewmodel.RideViewModel
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,13 +21,11 @@ import com.revvo.ui.theme.*
 @Composable
 fun HomeScreen(
     onRideClick  : (String) -> Unit,
-    onCreateRide : () -> Unit
-) {
-    val rides = listOf(
-        RideCardData("1","Mussoorie Night Ride","Yash R.","Sun, 22 Jun · 6:00 AM","120 km",8,15,RideStatus.UPCOMING,"Dehradun"),
-        RideCardData("2","Rishikesh Highway Blast","Arjun K.","Sat, 28 Jun · 5:30 AM","75 km",5,10,RideStatus.LIVE,"Haridwar"),
-        RideCardData("3","Chakrata Forest Trail","Priya S.","Sun, 29 Jun · 7:00 AM","200 km",12,12,RideStatus.COMPLETED,"Dehradun")
-    )
+    onCreateRide : () -> Unit,
+    rideViewModel: RideViewModel
+) 
+    {
+    val rides by rideViewModel.rideCards.collectAsState()
 
     val stats = listOf(
         Triple(Icons.Default.TwoWheeler, "RIDES",   "24"),
