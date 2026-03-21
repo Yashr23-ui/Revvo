@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         // Show bottom nav only on main screens
-                        if (currentScreen in listOf("home", "profile", "create")) {
+                        if (currentScreen in listOf("home", "rides", "profile", "create")) {
                             BottomNavigationBar(
                                 currentRoute   = currentScreen,
                                 onItemSelected = { currentScreen = it }

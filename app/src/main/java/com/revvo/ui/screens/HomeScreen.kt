@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.revvo.ui.components.*
 import com.revvo.ui.theme.*
+import androidx.compose.foundation.clickable
 
 @Composable
 fun HomeScreen(
@@ -141,6 +142,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
                                 .background(RevvoOrange.copy(alpha = 0.12f))
+                                .clickable { onCreateRide() }
                                 .padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Text(
