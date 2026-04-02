@@ -1,28 +1,45 @@
 package com.revvo.ui.theme
 
-import androidx.compose.material3.*
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
-private val RevvoDarkColorScheme = darkColorScheme(
-    primary        = RevvoOrange,
-    onPrimary      = RevvoWhite,
-    secondary      = RevvoOrangeLight,
-    onSecondary    = RevvoDark,
-    background     = RevvoDark,
-    onBackground   = RevvoWhite,
-    surface        = RevvoSurface,
-    onSurface      = RevvoWhite,
-    surfaceVariant = RevvoSurfaceLight,
-    outline        = RevvoGrayDark,
-    error          = RevvoRed
+private val DarkColorScheme = darkColorScheme(
+    primary = Primary,
+    onPrimary = OnPrimary,
+    primaryContainer = PrimaryContainer,
+    surface = Surface,
+    onSurface = OnSurface,
+    secondary = Secondary,
+    tertiary = Tertiary,
+    surfaceVariant = SurfaceContainerHighest,
+    outlineVariant = OutlineVariant
 )
 
 @Composable
-fun RevvoTheme(content: @Composable () -> Unit) {
+fun RevvoTheme(
+    darkTheme: Boolean = true, // Force dark theme for tactical look
+    content: @Composable () -> Unit
+) {
+    val colorScheme = DarkColorScheme
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.surface.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+        }
+    }
+
     MaterialTheme(
-        colorScheme = RevvoDarkColorScheme,
-        typography  = RevvoTypography,
-        content     = content
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
     )
 }

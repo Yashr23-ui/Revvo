@@ -1,241 +1,172 @@
 package com.revvo.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.revvo.ui.components.*
+import coil3.compose.AsyncImage
 import com.revvo.ui.theme.*
 
 @Composable
 fun RideDetailsScreen(
-    rideId : String,
-    onBack : () -> Unit,
-    onJoin : (String) -> Unit
+    rideId: String,
+    onBack: () -> Unit,
+    onJoin: () -> Unit
 ) {
-    val ride = RideCardData(
-        rideId        = rideId,
-        title         = "Mussoorie Night Ride",
-        organizer     = "Yash R.",
-        date          = "Sun, 22 Jun · 6:00 AM",
-        distance      = "120 km",
-        memberCount   = 8,
-        maxMembers    = 15,
-        status        = RideStatus.UPCOMING,
-        startLocation = "Dehradun"
-    )
-
-    val routePoints = listOf(
-        "Clock Tower, Dehradun" to "START",
-        "Sahastradhara Road"    to "WP 1",
-        "Kimadi Village"        to "WP 2",
-        "Mussoorie Mall Road"   to "FINISH"
-    )
-
-    val riders = listOf("YR" to "Yash R.","AK" to "Arjun K.",
-        "PS" to "Priya S.","RM" to "Rohan M.",
-        "ST" to "Sneha T.","DP" to "Dev P.")
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(RevvoDark)
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(RevvoDark)) {
         LazyColumn(
-            modifier       = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 110.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
+            item { 
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = RevvoWhite)
+                    }
+                }
+            }
 
-            // ── Back + Title ──────────────────────────────────────────
+            // Featured Ride Card
             item {
-                AnimatedScreenEntry {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 12.dp, end = 20.dp, top = 52.dp, bottom = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = onBack) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(RevvoSurface),
-                                contentAlignment = Alignment.Center
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = RevvoSurface.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+                ) {
+                    Column {
+                        Box(modifier = Modifier.height(256.dp).fillMaxWidth()) {
+                            AsyncImage(
+                                model = "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=800",
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+                                contentScale = ContentScale.Crop,
+                                alpha = 0.6f
+                            )
+                            Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, RevvoDark))))
+
+                            Surface(
+                                modifier = Modifier.padding(16.dp),
+                                color = RevvoOrange.copy(alpha = 0.9f),
+                                shape = CircleShape,
+                                border = BorderStroke(1.dp, RevvoOrange.copy(alpha = 0.5f))
                             ) {
-                                Icon(
-                                    imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back",
-                                    tint               = RevvoWhite,
-                                    modifier           = Modifier.size(20.dp)
+                                Text(
+                                    "UPCOMING",
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column {
-                            Text(
-                                text          = "RIDE DETAILS",
-                                fontSize      = 10.sp,
-                                color         = RevvoOrange,
-                                fontWeight    = FontWeight.Black,
-                                letterSpacing = 3.sp
-                            )
-                            Text(
-                                text       = "Overview",
-                                style      = MaterialTheme.typography.headlineMedium,
-                                color      = RevvoWhite,
-                                fontWeight = FontWeight.Black
-                            )
+
+                        Column(modifier = Modifier.padding(24.dp).offset(y = (-64).dp)) {
+                            Text("MUSSOORIE NIGHT RIDE", style = MaterialTheme.typography.displayLarge, fontSize = 24.sp, color = Color.White)
+                            Text("HOSTED BY YASH R.", style = MaterialTheme.typography.labelSmall, color = RevvoOrange, letterSpacing = 1.sp)
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                RideStat("120", "KM")
+                                VerticalDivider(modifier = Modifier.height(24.dp).width(1.dp), color = Color.White.copy(alpha = 0.1f))
+                                RideStat("8/15", "RIDERS")
+                                VerticalDivider(modifier = Modifier.height(24.dp).width(1.dp), color = Color.White.copy(alpha = 0.1f))
+                                RideStat("DEHRADUN", "START")
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Button(
+                                onClick = onJoin,
+                                modifier = Modifier.fillMaxWidth().height(56.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = RevvoOrange)
+                            ) {
+                                Text("JOIN RIDE", style = MaterialTheme.typography.headlineMedium, fontSize = 16.sp, fontWeight = FontWeight.Black)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Icon(Icons.Default.ArrowForward, null)
+                            }
                         }
                     }
                 }
             }
 
-            // ── Ride card ─────────────────────────────────────────────
+            // Tactical Route
             item {
-                AnimatedScreenEntry(delayMs = 100) {
-                    RideCard(
-                        ride     = ride,
-                        onClick  = {},
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
-                    )
-                }
-            }
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("TACTICAL ROUTE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = RevvoGray, letterSpacing = 2.sp)
+                        Icon(Icons.Default.Route, null, tint = RevvoOrange, modifier = Modifier.size(16.dp))
+                    }
 
-            // ── Route ─────────────────────────────────────────────────
-            item {
-                AnimatedScreenEntry(delayMs = 200) {
-                    Text(
-                        text          = "ROUTE",
-                        fontSize      = 10.sp,
-                        color         = RevvoGray,
-                        fontWeight    = FontWeight.Black,
-                        letterSpacing = 3.sp,
-                        modifier      = Modifier.padding(start = 20.dp, top = 24.dp, bottom = 10.dp)
-                    )
-                }
-            }
-
-            itemsIndexed(routePoints) { index, (place, tag) ->
-                AnimatedScreenEntry(delayMs = 250 + index * 50) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 4.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(RevvoSurface)
-                            .border(
-                                width = 2.dp,
-                                color = RevvoOrange,
-                                shape = RoundedCornerShape(
-                                    topStart = 12.dp, bottomStart = 12.dp,
-                                    topEnd = 0.dp, bottomEnd = 0.dp
-                                )
-                            )
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment     = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = RevvoSurface.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(24.dp),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(RevvoOrange)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(text = place, style = MaterialTheme.typography.bodyLarge, color = RevvoWhite)
+                        Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(32.dp)) {
+                            WaypointItem("START", "CLOCK TOWER", "09:00 PM ASSEMBLY", Icons.Default.RadioButtonChecked, isStart = true)
+                            WaypointItem("WP 1", "SAHASTRADHARA ROAD", "FUEL & REGROUP", Icons.Default.LocationOn)
+                            WaypointItem("WP 2", "KIMADI VILLAGE", "STEEP CLIMB INITIATED", Icons.Default.Terrain)
+                            WaypointItem("FINISH", "MUSSOORIE MALL ROAD", "01:30 AM ETA", Icons.Default.Flag, isFinish = true)
                         }
-                        Text(
-                            text          = tag,
-                            fontSize      = 9.sp,
-                            color         = RevvoOrange,
-                            fontWeight    = FontWeight.Black,
-                            letterSpacing = 1.sp
-                        )
                     }
                 }
             }
 
-            // ── Riders ────────────────────────────────────────────────
-            item {
-                AnimatedScreenEntry(delayMs = 400) {
-                    Text(
-                        text          = "RIDERS (${riders.size}/${ride.maxMembers})",
-                        fontSize      = 10.sp,
-                        color         = RevvoGray,
-                        fontWeight    = FontWeight.Black,
-                        letterSpacing = 3.sp,
-                        modifier      = Modifier.padding(start = 20.dp, top = 24.dp, bottom = 10.dp)
-                    )
-                }
-            }
+            item { Spacer(modifier = Modifier.height(120.dp)) }
+        }
+    }
+}
 
-            itemsIndexed(riders) { index, (initials, name) ->
-                AnimatedScreenEntry(delayMs = 450 + index * 40) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 4.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(RevvoSurface)
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Initials avatar
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(RevvoOrange.copy(alpha = 0.12f))
-                                .border(1.dp, RevvoOrange.copy(alpha = 0.4f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text       = initials,
-                                fontSize   = 11.sp,
-                                fontWeight = FontWeight.Black,
-                                color      = RevvoOrange
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(text = name, style = MaterialTheme.typography.bodyLarge, color = RevvoWhite)
-                    }
-                }
+@Composable
+fun RideStat(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, style = MaterialTheme.typography.headlineMedium, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, color = RevvoGray, letterSpacing = 1.sp)
+    }
+}
+
+@Composable
+fun WaypointItem(label: String, title: String, sub: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isStart: Boolean = false, isFinish: Boolean = false) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        Box(modifier = Modifier.width(24.dp), contentAlignment = Alignment.TopCenter) {
+            if (!isFinish) {
+                VerticalDivider(modifier = Modifier.padding(top = 24.dp).width(2.dp).fillMaxHeight(), color = if (isStart) RevvoOrange else Color.White.copy(alpha = 0.1f))
+            }
+            Surface(
+                modifier = Modifier.size(24.dp),
+                color = if (isStart) RevvoOrange else RevvoSurfaceLight,
+                shape = CircleShape,
+                border = if (!isStart) BorderStroke(1.dp, RevvoOrange.copy(alpha = 0.5f)) else null
+            ) {
+                Icon(icon, null, modifier = Modifier.padding(4.dp), tint = if (isStart) Color.White else RevvoOrange)
             }
         }
-
-        // ── Floating JOIN button ──────────────────────────────────────
-        Button(
-            onClick  = { onJoin(rideId) },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 24.dp)
-                .height(56.dp),
-            shape  = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = RevvoOrange)
-        ) {
-            Text(
-                text          = "JOIN THIS RIDE",
-                fontSize      = 14.sp,
-                fontWeight    = FontWeight.Black,
-                color         = RevvoWhite,
-                letterSpacing = 3.sp
-            )
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, color = if (isStart || isFinish) RevvoOrange else RevvoGray, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(title, style = MaterialTheme.typography.headlineMedium, fontSize = 16.sp, color = Color.White)
+            Text(sub, style = MaterialTheme.typography.bodyLarge, fontSize = 12.sp, color = RevvoGray)
         }
     }
 }

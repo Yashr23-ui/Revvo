@@ -79,3 +79,38 @@ fun StatsCard(
         }
     }
 }
+
+@Composable
+fun AggressiveStatCard(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(RevvoSurface)
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = RevvoOrange,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = value,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Black,
+            color = RevvoWhite
+        )
+        Text(
+            text = label,
+            fontSize = 10.sp,
+            color = RevvoGray,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
