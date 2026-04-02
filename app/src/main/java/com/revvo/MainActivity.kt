@@ -26,13 +26,13 @@ class MainActivity : ComponentActivity() {
 
                 // ── Track which screen is currently showing ──────────────────
                 var currentScreen  by remember { mutableStateOf("home") }
-                var selectedRideId by remember { mutableStateOf("DEFAULT_RIDE") }
+                var selectedRideId by remember { mutableStateOf("") }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         // Show bottom nav only on main screens
-                        if (currentScreen in listOf("home", "profile", "create", "rides")) {
+                        if (currentScreen in listOf("home", "profile", "create")) {
                             BottomNavigationBar(
                                 currentRoute   = currentScreen,
                                 onItemSelected = { currentScreen = it }
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                             "home" -> HomeScreen(
                                 onRideClick  = { rideId ->
                                     selectedRideId = rideId
-                                    currentScreen  = "rides"
+                                    currentScreen  = "rideDetails"
                                 },
                                 onCreateRide = { currentScreen = "create" }
                             )
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                                 onEditProfile = { }
                             )
 
-                            "rides" -> RideDetailsScreen(
+                            "rideDetails" -> RideDetailsScreen(
                                 rideId = selectedRideId,
                                 onBack = { currentScreen = "home" },
                                 onJoin = { currentScreen = "home" }
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                             else -> HomeScreen(
                                 onRideClick  = { rideId ->
                                     selectedRideId = rideId
-                                    currentScreen  = "rides"
+                                    currentScreen  = "rideDetails"
                                 },
                                 onCreateRide = { currentScreen = "create" }
                             )

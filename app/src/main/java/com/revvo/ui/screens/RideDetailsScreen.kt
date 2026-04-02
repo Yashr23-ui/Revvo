@@ -24,16 +24,43 @@ import com.revvo.ui.theme.*
 
 @Composable
 fun RideDetailsScreen(
-    rideId: String,
-    onBack: () -> Unit,
-    onJoin: () -> Unit
+    rideId : String,
+    onBack : () -> Unit,
+    onJoin : (String) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(RevvoDark)) {
+    val ride = RideCardData(
+        rideId        = rideId,
+        title         = "Mussoorie Night Ride",
+        organizer     = "Yash R.",
+        date          = "Sun, 22 Jun · 6:00 AM",
+        distance      = "120 km",
+        memberCount   = 8,
+        maxMembers    = 15,
+        status        = RideStatus.UPCOMING,
+        startLocation = "Dehradun"
+    )
+
+    val routePoints = listOf(
+        "Clock Tower, Dehradun" to "START",
+        "Sahastradhara Road"    to "WP 1",
+        "Kimadi Village"        to "WP 2",
+        "Mussoorie Mall Road"   to "FINISH"
+    )
+
+    val riders = listOf("YR" to "Yash R.","AK" to "Arjun K.",
+        "PS" to "Priya S.","RM" to "Rohan M.",
+        "ST" to "Sneha T.","DP" to "Dev P.")
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RevvoDark)
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            item { 
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -112,11 +139,17 @@ fun RideDetailsScreen(
 
             // Tactical Route
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("TACTICAL ROUTE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = RevvoGray, letterSpacing = 2.sp)
-                        Icon(Icons.Default.Route, null, tint = RevvoOrange, modifier = Modifier.size(16.dp))
-                    }
+                AnimatedScreenEntry(delayMs = 400) {
+                    Text(
+                        text          = "RIDERS (${riders.size}/${ride.maxMembers})",
+                        fontSize      = 10.sp,
+                        color         = RevvoGray,
+                        fontWeight    = FontWeight.Black,
+                        letterSpacing = 3.sp,
+                        modifier      = Modifier.padding(start = 20.dp, top = 24.dp, bottom = 10.dp)
+                    )
+                }
+            }
 
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -147,21 +180,24 @@ fun RideStat(value: String, label: String) {
     }
 }
 
-@Composable
-fun WaypointItem(label: String, title: String, sub: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isStart: Boolean = false, isFinish: Boolean = false) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        Box(modifier = Modifier.width(24.dp), contentAlignment = Alignment.TopCenter) {
-            if (!isFinish) {
-                VerticalDivider(modifier = Modifier.padding(top = 24.dp).width(2.dp).fillMaxHeight(), color = if (isStart) RevvoOrange else Color.White.copy(alpha = 0.1f))
-            }
-            Surface(
-                modifier = Modifier.size(24.dp),
-                color = if (isStart) RevvoOrange else RevvoSurfaceLight,
-                shape = CircleShape,
-                border = if (!isStart) BorderStroke(1.dp, RevvoOrange.copy(alpha = 0.5f)) else null
-            ) {
-                Icon(icon, null, modifier = Modifier.padding(4.dp), tint = if (isStart) Color.White else RevvoOrange)
-            }
+        // ── Floating JOIN button ──────────────────────────────────────
+        Button(
+            onClick  = { onJoin(rideId) },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 24.dp)
+                .height(56.dp),
+            shape  = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = RevvoOrange)
+        ) {
+            Text(
+                text          = "JOIN THIS RIDE",
+                fontSize      = 14.sp,
+                fontWeight    = FontWeight.Black,
+                color         = RevvoWhite,
+                letterSpacing = 3.sp
+            )
         }
         Column {
             Text(label, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, color = if (isStart || isFinish) RevvoOrange else RevvoGray, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
