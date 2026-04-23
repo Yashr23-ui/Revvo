@@ -56,7 +56,11 @@ class MainActivity : ComponentActivity() {
 
                             "create" -> CreateRideScreen(
                                 onBack        = { currentScreen = "home" },
-                                onRideCreated = { currentScreen = "home" }
+                                onRideCreated = { title, start, dest, time, max, desc ->
+                                    // Here you would normally call your ViewModel
+                                    // rideViewModel.createRide(title, start, dest, time, max, desc)
+                                    currentScreen = "home"
+                                }
                             )
 
                             "profile" -> ProfileScreen(

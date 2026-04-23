@@ -9,7 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,8 +27,15 @@ import com.revvo.ui.theme.*
 @Composable
 fun CreateRideScreen(
     onBack: () -> Unit = {},
-    onRideCreated: () -> Unit = {}
+    onRideCreated: (title: String, start: String, destination: String, dateTime: String, maxRiders: String, description: String) -> Unit = { _, _, _, _, _, _ -> }
 ) {
+    var title by remember { mutableStateOf("") }
+    var start by remember { mutableStateOf("") }
+    var destination by remember { mutableStateOf("") }
+    var dateTime by remember { mutableStateOf("") }
+    var maxRiders by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+
     Box(modifier = Modifier.fillMaxSize().background(RevvoDark)) {
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
@@ -66,16 +73,16 @@ fun CreateRideScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                    RevvoInput("RIDE TITLE", "Morning Canyon Blast", Icons.Default.Motorcycle)
+                    RevvoInput("RIDE TITLE", "Morning Canyon Blast", Icons.Default.Motorcycle, value = title, onValueChange = { title = it })
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        RevvoInput("START", "Santa Monica Pier", Icons.Default.Navigation, Modifier.weight(1f))
-                        RevvoInput("DESTINATION", "Mulholland Drive", Icons.Default.LocationOn, Modifier.weight(1f))
+                        RevvoInput("START", "Santa Monica Pier", Icons.Default.Navigation, Modifier.weight(1f), value = start, onValueChange = { start = it })
+                        RevvoInput("DESTINATION", "Mulholland Drive", Icons.Default.LocationOn, Modifier.weight(1f), value = destination, onValueChange = { destination = it })
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        RevvoInput("DATE & TIME", "mm/dd/yyyy, --:--", Icons.Default.CalendarToday, Modifier.weight(1f))
-                        RevvoInput("MAX RIDERS", "12", Icons.Default.Groups, Modifier.weight(1f))
+                        RevvoInput("DATE & TIME", "mm/dd/yyyy, --:--", Icons.Default.CalendarToday, Modifier.weight(1f), value = dateTime, onValueChange = { dateTime = it })
+                        RevvoInput("MAX RIDERS", "12", Icons.Default.Groups, Modifier.weight(1f), value = maxRiders, onValueChange = { maxRiders = it })
                     }
-                    RevvoInput("DESCRIPTION", "Briefing: Intermediate pace...", Icons.Default.EditNote, minHeight = 120.dp)
+                    RevvoInput("DESCRIPTION", "Briefing: Intermediate pace...", Icons.Default.EditNote, minHeight = 120.dp, value = description, onValueChange = { description = it })
                 }
             }
 
@@ -109,7 +116,7 @@ fun CreateRideScreen(
 
             item {
                 Button(
-                    onClick = onRideCreated,
+                    onClick = { onRideCreated(title, start, destination, dateTime, maxRiders, description) },
                     modifier = Modifier.fillMaxWidth().height(64.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = RevvoOrange)
@@ -133,7 +140,15 @@ fun CreateRideScreen(
 }
 
 @Composable
-fun RevvoInput(label: String, placeholder: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier, minHeight: androidx.compose.ui.unit.Dp = 56.dp) {
+fun RevvoInput(
+    label: String, 
+    placeholder: String, 
+    icon: androidx.compose.ui.graphics.vector.ImageVector, 
+    modifier: Modifier = Modifier, 
+    minHeight: androidx.compose.ui.unit.Dp = 56.dp,
+    value: String = "",
+    onValueChange: (String) -> Unit = {}
+) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = label,
@@ -143,20 +158,31 @@ fun RevvoInput(label: String, placeholder: String, icon: androidx.compose.ui.gra
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.sp
         )
-        Surface(
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth().heightIn(min = minHeight),
-            color = RevvoSurfaceLight.copy(alpha = 0.3f),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
-        ) {
-            Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = if (minHeight > 56.dp) Alignment.Top else Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Icon(icon, null, modifier = Modifier.size(20.dp), tint = RevvoOrange.copy(alpha = 0.6f))
+            placeholder = {
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.bodyLarge,
                     color = RevvoGray.copy(alpha = 0.3f)
                 )
-            }
-        }
+            },
+            leadingIcon = {
+                Icon(icon, null, modifier = Modifier.size(20.dp), tint = RevvoOrange.copy(alpha = 0.6f))
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = RevvoSurfaceLight.copy(alpha = 0.3f),
+                unfocusedContainerColor = RevvoSurfaceLight.copy(alpha = 0.3f),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                cursorColor = RevvoOrange,
+                focusedTextColor = RevvoWhite,
+                unfocusedTextColor = RevvoWhite
+            ),
+            shape = RoundedCornerShape(12.dp)
+        )
     }
 }
