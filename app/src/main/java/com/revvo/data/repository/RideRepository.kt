@@ -1,66 +1,36 @@
 package com.revvo.data.repository
 
 import com.revvo.data.model.Ride
+import kotlinx.coroutines.flow.Flow
 
-class RideRepository {
+/**
+ * Repository contract for ride data.
+ *
+ * IMPORTANT: This is an INTERFACE so that we can swap the in-memory implementation for
+ * a Firebase-backed one in Phase 3 without touching ViewModels or screens.
+ *
+ * - Reads are exposed as [Flow] so the UI re-renders automatically when data changes
+ *   (whether from a local mutation or, later, a Firestore snapshot listener).
+ * - Writes are `suspend` so the future Firebase implementation can perform real I/O
+ *   on a background dispatcher.
+ */
+interface RideRepository {
 
-    private val rides = mutableListOf(
-        Ride(
-            id = "1",
-            title = "Landour Ride",
-            location = "Dehradun",
-            date = "23 Feb",
-            distance = "18 km",
-            maxRiders = 20,
-            joinedRiders = 8,
-            description = "Morning mountain ride to Landour."
-        ),
-        Ride(
-            id = "2",
-            title = "Mussoorie Loop",
-            location = "Mussoorie",
-            date = "25 Feb",
-            distance = "32 km",
-            maxRiders = 15,
-            joinedRiders = 6,
-            description = "Scenic group ride through Mussoorie loop."
-        )
-    )
+    /** Stream of all rides. Emits a new list every time the underlying data changes. */
+    fun observeRides(): Flow<List<Ride>>
 
-    fun getRides(): List<Ride> {
-        return rides
-    }
+    /** Snapshot of a single ride, or null if not found. Suspending so it can hit network later. */
+    suspend fun getRideById(id: String): Ride?
 
-    fun addRide(ride: Ride) {
-        rides.add(ride)
-    }
+    /** Stream of a single ride. Emits null if the ride disappears. */
+    fun observeRideById(id: String): Flow<Ride?>
 
-    fun joinRide(id: String) {
-        val index = rides.indexOfFirst { it.id == id }
-        if (index == -1) return
+    /** Add a brand new ride. Returns the created ride (with generated id). */
+    suspend fun addRide(ride: Ride): Ride
 
-        val ride = rides[index]
-        val max = ride.maxRiders.coerceAtLeast(0)
-        val current = ride.joinedRiders.coerceIn(0, max)
-        val updatedJoined = (current + 1).coerceAtMost(max)
+    /** Increment joinedRiders for the given ride if there's room. No-op if already full. */
+    suspend fun joinRide(rideId: String)
 
-        if (updatedJoined == current) return
-        rides[index] = ride.copy(joinedRiders = updatedJoined)
-    }
-
-    fun leaveRide(id: String) {
-        val index = rides.indexOfFirst { it.id == id }
-        if (index == -1) return
-
-        val ride = rides[index]
-        val current = ride.joinedRiders.coerceAtLeast(0)
-        val updatedJoined = (current - 1).coerceAtLeast(0)
-
-        if (updatedJoined == current) return
-        rides[index] = ride.copy(joinedRiders = updatedJoined)
-    }
-
-    fun getRideById(id: String): Ride? {
-        return rides.find { it.id == id }
-    }
+    /** Decrement joinedRiders. No-op if already zero. */
+    suspend fun leaveRide(rideId: String)
 }

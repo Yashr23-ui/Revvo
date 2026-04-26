@@ -13,3 +13,21 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# JVM crash logs and replay files (Android Studio sometimes drops these in the project root)
+hs_err_pid*.log
+replay_pid*.log
+
+# Kotlin build cache
+.kotlin/
+
+# Android Studio's per-user run config noise (keep shared run configs in /.idea/runConfigurations)
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/usage.statistics.xml
+/.idea/jarRepositories.xml
+/.idea/migrations.xml
+/.idea/other.xml
+/.idea/deviceManager.xml
+/.idea/studiobot.xml
+/.idea/appInsightsSettings.xml

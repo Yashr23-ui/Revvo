@@ -1,223 +1,238 @@
 package com.revvo.ui.screens
 
-import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Motorcycle
+import androidx.compose.material.icons.filled.Route
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.revvo.ui.components.*
-import com.revvo.ui.theme.*
+import coil3.compose.AsyncImage
+import com.revvo.ui.state.UiState
+import com.revvo.ui.theme.RevvoDark
+import com.revvo.ui.theme.RevvoGray
+import com.revvo.ui.theme.RevvoGrayDark
+import com.revvo.ui.theme.RevvoOrange
+import com.revvo.ui.theme.RevvoOrangeLight
+import com.revvo.ui.theme.RevvoSurface
+import com.revvo.ui.theme.RevvoSurfaceLight
+import com.revvo.ui.theme.RevvoWhite
+import com.revvo.viewmodel.RideViewModel
+import com.revvo.viewmodel.UserViewModel
 
+/**
+ * Home screen.
+ *
+ * NOTE: Several visual elements ("VORTEX-X1", "Last Ride Summary", diagnostics) are
+ * placeholder/preview content. They're tagged with `// PREVIEW:` so they're easy to find
+ * and replace once telemetry data exists in the data model.
+ */
 @Composable
 fun HomeScreen(
-    onRideClick  : (String) -> Unit,
-    onCreateRide : () -> Unit
+    rideViewModel: RideViewModel,
+    userViewModel: UserViewModel,
+    onRideClick: (String) -> Unit,
+    onCreateRide: () -> Unit
 ) {
-    val rides = listOf(
-        RideCardData("1","Mussoorie Night Ride","Yash R.","Sun, 22 Jun · 6:00 AM","120 km",8,15,RideStatus.UPCOMING,"Dehradun"),
-        RideCardData("2","Rishikesh Highway Blast","Arjun K.","Sat, 28 Jun · 5:30 AM","75 km",5,10,RideStatus.LIVE,"Haridwar"),
-        RideCardData("3","Chakrata Forest Trail","Priya S.","Sun, 29 Jun · 7:00 AM","200 km",12,12,RideStatus.COMPLETED,"Dehradun")
-    )
+    val userState by userViewModel.userState.collectAsState()
+    val rideCards by rideViewModel.rideCards.collectAsState()
 
-    val stats = listOf(
-        Triple(Icons.Default.TwoWheeler, "RIDES",   "24"),
-        Triple(Icons.Default.Timeline,   "KMS",     "1.2k"),
-        Triple(Icons.Default.People,     "BUDDIES", "31")
-    )
+    val firstName: String = when (val s = userState) {
+        is UiState.Success -> s.data.name.split(" ").firstOrNull().orEmpty()
+        else -> ""
+    }
+    val totalDistance: Int = (userState as? UiState.Success)?.data?.totalDistanceKm ?: 0
+    val totalRides: Int = (userState as? UiState.Success)?.data?.totalRides ?: 0
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(RevvoDark)
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(RevvoDark)) {
         LazyColumn(
-            modifier       = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
+            item { Spacer(modifier = Modifier.height(80.dp)) }
 
-            // ── Header ────────────────────────────────────────────────
             item {
-                AnimatedScreenEntry(delayMs = 0) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, end = 20.dp, top = 56.dp, bottom = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text          = "HEY RIDER 🏍️",
-                                fontSize      = 11.sp,
-                                color         = RevvoGray,
-                                fontWeight    = FontWeight.Medium,
-                                letterSpacing = 2.sp
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text       = "Ready to\nride?",
-                                style      = MaterialTheme.typography.headlineLarge,
-                                color      = RevvoWhite,
-                                fontWeight = FontWeight.Black,
-                                lineHeight = 32.sp
-                            )
-                        }
-                        // Notification bell
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(RevvoSurface),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector        = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint               = RevvoGray,
-                                modifier           = Modifier.size(22.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ── Stats row ─────────────────────────────────────────────
-            item {
-                AnimatedScreenEntry(delayMs = 100) {
-                    Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text          = "YOUR STATS",
-                            fontSize      = 10.sp,
-                            color         = RevvoGray,
-                            fontWeight    = FontWeight.Black,
-                            letterSpacing = 3.sp,
-                            modifier      = Modifier.padding(start = 20.dp, top = 28.dp, bottom = 12.dp)
+                            text = "SYSTEM READY",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = RevvoOrange,
+                            letterSpacing = 2.sp
                         )
-                        Row(
-                            modifier              = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            stats.forEach { (icon, label, value) ->
-                                AggressiveStatCard(
-                                    icon  = icon,
-                                    label = label,
-                                    value = value,
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ── Rides header ──────────────────────────────────────────
-            item {
-                AnimatedScreenEntry(delayMs = 200) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
                         Text(
-                            text          = "UPCOMING RIDES",
-                            fontSize      = 10.sp,
-                            color         = RevvoWhite,
-                            fontWeight    = FontWeight.Black,
-                            letterSpacing = 3.sp
+                            text = if (firstName.isEmpty()) "Welcome" else "Good Evening, $firstName",
+                            style = MaterialTheme.typography.displayLarge,
+                            color = RevvoWhite
                         )
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(RevvoOrange.copy(alpha = 0.12f))
-                                .padding(horizontal = 14.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text          = "+ CREATE",
-                                fontSize      = 9.sp,
-                                color         = RevvoOrange,
-                                fontWeight    = FontWeight.Black,
-                                letterSpacing = 1.sp
-                            )
-                        }
+                    }
+                    IconButton(
+                        onClick = onCreateRide,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(RevvoOrange.copy(alpha = 0.1f))
+                    ) {
+                        Icon(Icons.Default.Bolt, contentDescription = "Create", tint = RevvoOrange)
                     }
                 }
             }
 
-            // ── Ride cards ────────────────────────────────────────────
-            itemsIndexed(rides) { index, ride ->
-                AnimatedScreenEntry(delayMs = 300 + index * 80) {
-                    RideCard(
-                        ride     = ride,
-                        onClick  = onRideClick,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)
+            // First real ride (if any) as the hero. Falls back to a placeholder when empty.
+            item {
+                val featured = rideCards.firstOrNull()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(280.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                ) {
+                    AsyncImage(
+                        model = "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=800",
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, RevvoDark.copy(alpha = 0.8f)),
+                                    startY = 300f
+                                )
+                            )
+                    )
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp)
+                            .background(RevvoSurface.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            .padding(12.dp)
+                    ) {
+                        if (featured != null) {
+                            Text("UPCOMING", style = MaterialTheme.typography.labelSmall, color = RevvoGray.copy(alpha = 0.7f))
+                            Text(
+                                featured.title.uppercase(),
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = RevvoOrange,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text("NO RIDES YET", style = MaterialTheme.typography.labelSmall, color = RevvoGray.copy(alpha = 0.7f))
+                            Text("CREATE ONE", style = MaterialTheme.typography.headlineMedium, color = RevvoOrange, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
+
+            // PREVIEW: telemetry block — replace with real "last ride" data in Phase 3.
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = RevvoSurface.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, RevvoGrayDark.copy(alpha = 0.1f))
+                ) {
+                    Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Last Ride Summary", style = MaterialTheme.typography.headlineMedium, fontSize = 18.sp, color = RevvoGray)
+                            Text("preview", style = MaterialTheme.typography.labelSmall, color = RevvoGray.copy(alpha = 0.5f))
+                        }
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                            StatItem("Distance", "—", "KM")
+                            VerticalDivider(modifier = Modifier.height(48.dp).width(1.dp), color = RevvoGrayDark.copy(alpha = 0.2f))
+                            StatItem("Avg Speed", "—", "KM/H")
+                            VerticalDivider(modifier = Modifier.height(48.dp).width(1.dp), color = RevvoGrayDark.copy(alpha = 0.2f))
+                            StatItem("Time", "—", "MIN")
+                        }
+                    }
+                }
+            }
+
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    QuickStatCard(Modifier.weight(1f), Icons.Default.Route, "Total Distance", "$totalDistance KM", RevvoOrangeLight)
+                    QuickStatCard(Modifier.weight(1f), Icons.Default.Motorcycle, "Total Rides", "$totalRides", RevvoOrange)
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(120.dp)) }
         }
     }
 }
 
-// ── Aggressive stat card with left orange border ──────────────────────────────
 @Composable
-fun AggressiveStatCard(
-    icon     : androidx.compose.ui.graphics.vector.ImageVector,
-    label    : String,
-    value    : String,
-    modifier : Modifier = Modifier
+private fun StatItem(label: String, value: String, unit: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label.uppercase(), style = MaterialTheme.typography.labelSmall, color = RevvoOrangeLight)
+        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(value, style = MaterialTheme.typography.displayLarge, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+            Text(unit, style = MaterialTheme.typography.labelSmall, color = RevvoGray, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+private fun QuickStatCard(
+    modifier: Modifier,
+    icon: ImageVector,
+    label: String,
+    value: String,
+    iconColor: Color
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(RevvoSurface)
-            .then(
-                Modifier.padding(start = 2.dp)
-            )
+    Surface(
+        modifier = modifier,
+        color = RevvoSurfaceLight,
+        shape = RoundedCornerShape(24.dp)
     ) {
-        // Left orange accent strip
-        Box(
-            modifier = Modifier
-                .width(3.dp)
-                .height(80.dp)
-                .clip(RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp))
-                .background(RevvoOrange)
-        )
-        Column(
-            modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 8.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(
-                imageVector        = icon,
-                contentDescription = label,
-                tint               = RevvoOrange,
-                modifier           = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text       = value,
-                fontSize   = 22.sp,
-                fontWeight = FontWeight.Black,
-                color      = RevvoWhite
-            )
-            Text(
-                text          = label,
-                fontSize      = 9.sp,
-                color         = RevvoGray,
-                fontWeight    = FontWeight.Medium,
-                letterSpacing = 1.sp
-            )
+            Surface(color = iconColor.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)) {
+                Icon(icon, null, modifier = Modifier.padding(8.dp).size(20.dp), tint = iconColor)
+            }
+            Column {
+                Text(label.uppercase(), style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, color = RevvoGray)
+                Text(value, style = MaterialTheme.typography.headlineMedium, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

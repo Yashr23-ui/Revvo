@@ -1,23 +1,23 @@
 package com.revvo.data.repository
 
 import com.revvo.data.model.User
+import kotlinx.coroutines.flow.Flow
 
-class UserRepository {
+/**
+ * Repository contract for the currently signed-in user.
+ *
+ * Phase 3 will replace [InMemoryUserRepository] with a Firebase-backed implementation that
+ * sources the user from FirebaseAuth + a Firestore /users/{uid} document. Callers shouldn't
+ * need to change.
+ */
+interface UserRepository {
 
-    private var user = User(
-        id = "1",
-        name = "Rider",
-        bike = "KTM Duke 390",
-        totalDistance = 520,
-        totalRides = 6,
-        exp = 1500
-    )
+    /** Stream of the current user. Emits null when signed out (Phase 3). */
+    fun observeCurrentUser(): Flow<User?>
 
-    fun getUser(): User {
-        return user
-    }
+    /** Snapshot. Returns null when signed out. */
+    suspend fun getCurrentUser(): User?
 
-    fun updateUser(updatedUser: User) {
-        user = updatedUser
-    }
+    /** Update editable profile fields. */
+    suspend fun updateUser(user: User)
 }

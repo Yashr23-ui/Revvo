@@ -1,19 +1,24 @@
 package com.revvo.ui.model
 
 import com.revvo.data.model.Ride
-import com.revvo.ui.components.RideCardData
-import com.revvo.ui.components.RideStatus
 
-fun Ride.toRideCardData(): RideCardData {
-    return RideCardData(
-        rideId = id,
-        title = title,
-        organizer = "Revvo Rider",
-        date = date,
-        distance = distance,
-        memberCount = joinedRiders,
-        maxMembers = maxRiders,
-        status = if (joinedRiders >= maxRiders) RideStatus.COMPLETED else RideStatus.UPCOMING,
-        startLocation = location
-    )
-}
+/**
+ * Pure mapping function: domain [Ride] -> UI [RideCardData].
+ *
+ * Pure & top-level so it's trivially unit-testable without instantiating anything.
+ *
+ * Note that we DO NOT derive [com.revvo.data.model.RideStatus] from `joinedRiders`/`maxRiders`
+ * here — that was a bug in the previous mapper. "Ride is full" is shown via member count;
+ * "Ride is completed" is a real lifecycle state on the domain model.
+ */
+fun Ride.toRideCardData(): RideCardData = RideCardData(
+    rideId = id,
+    title = title,
+    organizer = hostName,
+    date = displayDate,
+    distance = "$distanceKm km",
+    memberCount = joinedRiders,
+    maxMembers = maxRiders,
+    status = status,
+    startLocation = startLocation
+)

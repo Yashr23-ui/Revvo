@@ -5,20 +5,22 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.revvo.ui.theme.*
 import androidx.compose.ui.unit.dp
+import com.revvo.ui.navigation.Routes
+import com.revvo.ui.theme.*
 
-// Define each tab
+// Define each tab — route strings come from [Routes] so the bottom-bar and the nav
+// graph can never drift out of sync.
 sealed class BottomNavItem(
     val route : String,
     val label : String,
     val icon  : ImageVector
 ) {
-    object Home    : BottomNavItem("home",    "Home",    Icons.Default.Home)
-    object Rides   : BottomNavItem("rides",   "Rides",   Icons.Default.DirectionsBike)
-    object Create  : BottomNavItem("create",  "Create",  Icons.Default.AddCircle)
-    object Map     : BottomNavItem("map",     "Map",     Icons.Default.Map)
-    object Profile : BottomNavItem("profile", "Profile", Icons.Default.Person)
+    object Home    : BottomNavItem(Routes.HOME,        "Home",    Icons.Default.Home)
+    object Rides   : BottomNavItem(Routes.RIDES,       "Rides",   Icons.Default.DirectionsBike)
+    object Create  : BottomNavItem(Routes.CREATE_RIDE, "Create",  Icons.Default.AddCircle)
+    object Map     : BottomNavItem(Routes.MAP,         "Map",     Icons.Default.Map)
+    object Profile : BottomNavItem(Routes.PROFILE,     "Profile", Icons.Default.Person)
 }
 
 @Composable

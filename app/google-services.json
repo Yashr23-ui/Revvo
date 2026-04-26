@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "50133458412",
+    "project_id": "revvo-4f68e",
+    "storage_bucket": "revvo-4f68e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50133458412:android:61dab23724b7818d44b4c9",
+        "android_client_info": {
+          "package_name": "com.revvo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzAjXKBtvc5FdIj-xi9P1lolAKDmnNhRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
